@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Missions Dashboard</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-dark: #0f0f0f;
+            --card-bg: #1a1a1a;
+            --red-glow: #ff4d4d;
+            --green-glow: #00ff88;
+            --gray-glow: #555555;
+            --gold-glow: #ffd700; /* Color dorado para completado */
+            --text-white: #ffffff;
+            --text-dim: #777777;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-white);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .background-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .shape {
+            position: absolute;
+            border: 2px solid;
+            border-radius: 12px;
+        }
+
+        /* Cuadritos con diferentes colores */
+        .s1 { 
+            width: 60px; height: 60px; top: 10%; left: 8%; transform: rotate(15deg);
+            border-color: rgba(255, 77, 77, 0.3);
+            box-shadow: 0 0 15px rgba(255, 77, 77, 0.2);
+        }
+        .s2 { 
+            width: 50px; height: 50px; top: 25%; right: 12%; transform: rotate(-10deg);
+            border-color: rgba(0, 255, 136, 0.3);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.2);
+        }
+        .s3 { 
+            width: 70px; height: 70px; bottom: 15%; left: 15%; transform: rotate(30deg);
+            border-color: rgba(85, 85, 255, 0.3);
+            box-shadow: 0 0 15px rgba(85, 85, 255, 0.2);
+        }
+        .s4 { 
+            width: 55px; height: 55px; bottom: 20%; right: 5%; transform: rotate(-25deg);
+            border-color: rgba(255, 215, 0, 0.3);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+        }
+        .s5 { 
+            width: 40px; height: 40px; top: 5%; right: 40%; transform: rotate(5deg);
+            border-color: rgba(147, 112, 219, 0.3);
+            box-shadow: 0 0 15px rgba(147, 112, 219, 0.2);
+        }
+        .s6 { 
+            width: 45px; height: 45px; bottom: 5%; left: 45%; transform: rotate(-15deg);
+            border-color: rgba(255, 165, 0, 0.3);
+            box-shadow: 0 0 15px rgba(255, 165, 0, 0.2);
+        }
+
+        .main-title {
+            font-size: 5rem;
+            font-weight: 900;
+            margin: 0 0 40px 0;
+            text-align: center;
+            letter-spacing: -2px;
+            text-transform: capitalize;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 1200px;
+        }
+
+        .label-container {
+            color: var(--text-dim);
+            font-weight: bold;
+            margin-bottom: 15px;
+            margin-left: 10px;
+            display: block;
+            font-size: 1.1rem;
+        }
+
+        .row-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            gap: 20px;
+            width: 100%;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 30px;
+            padding: 60px 20px;
+            text-align: center;
+            position: relative;
+            border: 2px solid transparent;
+            flex: 1;
+            transition: all 0.3s ease;
+            min-width: 250px;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            background: #222;
+        }
+
+        .card.completed {
+            border-color: var(--gold-glow);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.2);
+        }
+
+        .card.completed .icon-main, 
+        .card.completed .top-right-icon, 
+        .card.completed .status { 
+            color: var(--gold-glow); 
+            border-color: var(--gold-glow); 
+        }
+
+        .card.locked {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .card.locked:hover {
+            transform: none;
+            background: var(--card-bg);
+        }
+
+        .icon-main {
+            width: 75px;
+            height: 75px;
+            border-radius: 50%;
+            border: 2px solid;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+        }
+
+        .top-right-icon {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+        }
+
+        .card h2 {
+            font-size: 1.6rem;
+            margin: 10px 0;
+            font-weight: 700;
+        }
+
+        .status {
+            font-size: 0.8rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            margin-top: 20px;
+        }
+
+        /* Tarjeta gris - Fácil */
+        .card.gray { border-color: var(--gray-glow); box-shadow: 0 10px 30px rgba(85, 85, 85, 0.1); }
+        .card.gray .icon-main, .card.gray .top-right-icon, .card.gray .status { color: var(--gray-glow); border-color: var(--gray-glow); }
+
+        /* Tarjeta verde - Normal */
+        .card.green { border-color: var(--green-glow); box-shadow: 0 10px 30px rgba(0, 255, 136, 0.1); }
+        .card.green .icon-main, .card.green .top-right-icon, .card.green .status { color: var(--green-glow); border-color: var(--green-glow); }
+
+        /* Tarjeta roja - Difícil */
+        .card.red { border-color: var(--red-glow); box-shadow: 0 10px 30px rgba(255, 77, 77, 0.2); }
+        .card.red .icon-main, .card.red .top-right-icon, .card.red .status { color: var(--red-glow); border-color: var(--red-glow); }
+        
+    </style>
+</head>
+<body>
+
+    <div class="background-shapes">
+        <div class="shape s1"></div>
+        <div class="shape s2"></div>
+        <div class="shape s3"></div>
+        <div class="shape s4"></div>
+        <div class="shape s5"></div>
+        <div class="shape s6"></div>
+    </div>
+
+    <h1 class="main-title">Missions</h1>
+
+    <div class="container">
+        <span class="label-container">container</span>
+        
+        <div class="row-container">
+            <!-- Fácil - Desbloqueado (Gris) -->
+            <div class="card gray" id="facil-card">
+                <div class="top-right-icon" id="facil-icon"><i data-lucide="unlock" size="20"></i></div>
+                <div class="icon-main"><i data-lucide="activity" size="32"></i></div>
+                <h2>Fácil</h2>
+                <div class="status" id="facil-status">DISPONIBLE</div>
+            </div>
+
+            <!-- Normal - Bloqueado (Verde) -->
+            <div class="card green locked" id="normal-card">
+                <div class="top-right-icon"><i data-lucide="lock" size="20"></i></div>
+                <div class="icon-main"><i data-lucide="compass" size="32"></i></div>
+                <h2>Normal</h2>
+                <div class="status">BLOQUEADO</div>
+            </div>
+
+            <!-- Difícil - Bloqueado (Rojo) -->
+            <div class="card red locked" id="dificil-card">
+                <div class="top-right-icon"><i data-lucide="lock" size="20"></i></div>
+                <div class="icon-main"><i data-lucide="trending-up" size="32"></i></div>
+                <h2>Difícil</h2>
+                <div class="status">BLOQUEADO</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        
+        // Estado del progreso (se guarda en localStorage)
+        let progress = {
+            easyCompleted: localStorage.getItem('easyCompleted') === 'true',
+            normalCompleted: localStorage.getItem('normalCompleted') === 'true',
+            difficultCompleted: localStorage.getItem('difficultCompleted') === 'true'
+        };
+
+        // Inicializar estado de las tarjetas
+        function initCards() {
+            const facilCard = document.getElementById('facil-card');
+            const normalCard = document.getElementById('normal-card');
+            const dificilCard = document.getElementById('dificil-card');
+            const facilIcon = document.getElementById('facil-icon');
+            const facilStatus = document.getElementById('facil-status');
+
+            // Actualizar tarjeta Fácil
+            if (progress.easyCompleted) {
+                facilCard.classList.remove('gray');
+                facilCard.classList.add('completed');
+                facilIcon.innerHTML = '<i data-lucide="check-circle" size="20"></i>';
+                facilStatus.textContent = 'COMPLETADO';
+                facilCard.style.cursor = 'default';
+                lucide.createIcons();
+            }
+
+            // Actualizar tarjeta Normal
+            if (progress.easyCompleted) {
+                normalCard.classList.remove('locked');
+                normalCard.style.opacity = '1';
+                normalCard.style.cursor = 'pointer';
+                normalCard.querySelector('.top-right-icon').innerHTML = '<i data-lucide="unlock" size="20"></i>';
+                normalCard.querySelector('.status').textContent = 'DISPONIBLE';
+                lucide.createIcons();
+            }
+
+            // Actualizar tarjeta Difícil
+            if (progress.normalCompleted) {
+                dificilCard.classList.remove('locked');
+                dificilCard.style.opacity = '1';
+                dificilCard.style.cursor = 'pointer';
+                dificilCard.querySelector('.top-right-icon').innerHTML = '<i data-lucide="unlock" size="20"></i>';
+                dificilCard.querySelector('.status').textContent = 'DISPONIBLE';
+                lucide.createIcons();
+            }
+
+            // Si Normal está completado, marcar como completado
+            if (progress.normalCompleted) {
+                normalCard.classList.remove('green');
+                normalCard.classList.add('completed');
+                normalCard.querySelector('.top-right-icon').innerHTML = '<i data-lucide="check-circle" size="20"></i>';
+                normalCard.querySelector('.status').textContent = 'COMPLETADO';
+                normalCard.style.cursor = 'default';
+                lucide.createIcons();
+            }
+
+            // Si Difícil está completado, marcar como completado
+            if (progress.difficultCompleted) {
+                dificilCard.classList.remove('red');
+                dificilCard.classList.add('completed');
+                dificilCard.querySelector('.top-right-icon').innerHTML = '<i data-lucide="check-circle" size="20"></i>';
+                dificilCard.querySelector('.status').textContent = 'COMPLETADO';
+                dificilCard.style.cursor = 'default';
+                lucide.createIcons();
+            }
+        }
+
+        // Manejar clics en las tarjetas
+        document.getElementById('facil-card').addEventListener('click', function() {
+            if (!progress.easyCompleted) {
+                window.location.href = 'sc/easy.html';
+            }
+        });
+
+        document.getElementById('normal-card').addEventListener('click', function() {
+            if (progress.easyCompleted && !progress.normalCompleted && !this.classList.contains('locked')) {
+                window.location.href = 'sc/normal.html';
+            }
+        });
+
+        document.getElementById('dificil-card').addEventListener('click', function() {
+            if (progress.normalCompleted && !progress.difficultCompleted && !this.classList.contains('locked')) {
+                window.location.href = 'sc/difficult.html';
+            }
+        });
+
+        // Inicializar al cargar
+        document.addEventListener('DOMContentLoaded', initCards);
+    </script>
+</body>
+</html>
