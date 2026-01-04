@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misiones Normales - Minecraft</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-dark: #0f0f0f;
+            --card-bg: #1a1a1a;
+            --orange-glow: #ff8c42;
+            --text-white: #ffffff;
+            --text-dim: #777777;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-white);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--text-dim);
+        }
+
+        .back-btn {
+            background: var(--card-bg);
+            border: 2px solid var(--orange-glow);
+            color: var(--orange-glow);
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: var(--orange-glow);
+            color: var(--bg-dark);
+        }
+
+        .title {
+            font-size: 3rem;
+            margin: 0;
+            color: var(--orange-glow);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: var(--card-bg);
+            border-radius: 10px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--orange-glow);
+            width: 0%;
+            transition: width 0.5s;
+            border-radius: 10px;
+        }
+
+        .missions-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .mission-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .mission-card:hover {
+            border-color: var(--orange-glow);
+            transform: translateY(-5px);
+        }
+
+        .mission-card.completed {
+            border-color: var(--orange-glow);
+            opacity: 0.7;
+        }
+
+        .mission-info {
+            flex: 1;
+        }
+
+        .mission-title {
+            font-size: 1.2rem;
+            margin: 0 0 5px 0;
+            color: var(--text-white);
+        }
+
+        .mission-desc {
+            font-size: 0.9rem;
+            margin: 0;
+            color: var(--text-dim);
+        }
+
+        .mission-number {
+            background: rgba(255, 140, 66, 0.1);
+            color: var(--orange-glow);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+
+        .complete-btn {
+            background: transparent;
+            border: 2px solid var(--orange-glow);
+            color: var(--orange-glow);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .complete-btn:hover:not(:disabled) {
+            background: var(--orange-glow);
+            color: var(--bg-dark);
+        }
+
+        .complete-btn.completed {
+            background: var(--orange-glow);
+            color: var(--bg-dark);
+        }
+
+        .complete-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--orange-glow);
+            margin: 0;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            margin: 5px 0 0 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <button class="back-btn" onclick="goBack()">
+                <i data-lucide="arrow-left"></i>
+                Volver
+            </button>
+            <h1 class="title">Misiones Normales</h1>
+            <div></div>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <p class="stat-number" id="completedCount">0</p>
+                <p class="stat-label">Completadas</p>
+            </div>
+            <div class="stat-item">
+                <p class="stat-number">35</p>
+                <p class="stat-label">Total Misiones</p>
+            </div>
+            <div class="stat-item">
+                <p class="stat-number" id="percentage">0%</p>
+                <p class="stat-label">Progreso</p>
+            </div>
+        </div>
+
+        <div class="missions-container" id="missionsContainer">
+            <!-- Misiones se generarán dinámicamente -->
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // Lista de 35 misiones normales de Minecraft
+        const normalMissions = [
+            { id: 1, title: "Encontrar diamantes", desc: "Encontrar al menos 3 diamantes" },
+            { id: 2, title: "Crear mesa de encantamientos", desc: "Construir mesa de encantamientos" },
+            { id: 3, title: "Enchantar herramientas", desc: "Encantar 3 herramientas diferentes" },
+            { id: 4, title: "Explorar el Nether", desc: "Encontrar portal y entrar al Nether" },
+            { id: 5, title: "Conseguir obsidiana", desc: "Minar 14 bloques de obsidiana" },
+            { id: 6, title: "Crear granja automática", desc: "Granja automática de cultivos" },
+            { id: 7, title: "Derrotar 10 zombis", desc: "Eliminar 10 zombis" },
+            { id: 8, title: "Encontrar fuerte", desc: "Localizar un fuerte del Nether" },
+            { id: 9, title: "Crear pociones", desc: "Hacer 3 tipos de pociones diferentes" },
+            { id: 10, title: "Construir aldea", desc: "Crear aldea con 5 casas" },
+            { id: 11, title: "Hacer granja de hierro", desc: "Granja automática de hierro" },
+            { id: 12, title: "Explorar océano", desc: "Encontrar monumento oceánico" },
+            { id: 13, title: "Crear mapa", desc: "Mapa completo de área 1000x1000" },
+            { id: 14, title: "Hacer rail system", desc: "Sistema de rieles de 100 bloques" },
+            { id: 15, title: "Encontrar templo del desierto", desc: "Explorar templo del desierto" },
+            { id: 16, title: "Crear armadura de diamante", desc: "Armadura completa de diamante" },
+            { id: 17, title: "Hacer granja de mobs", desc: "Granja automática de mobs" },
+            { id: 18, title: "Encontrar aldea NPC", desc: "Localizar aldea con aldeanos" },
+            { id: 19, title: "Crear herrería", desc: "Taller de herrería completo" },
+            { id: 20, title: "Hacer granja de caña de azúcar", desc: "Granja automática de caña" },
+            { id: 21, title: "Explorar cueva de hielo", desc: "Encontrar bioma de hielo" },
+            { id: 22, title: "Crear biblioteca", desc: "Biblioteca con 10 estanterías" },
+            { id: 23, title: "Hacer sistema de redstone", desc: "Circuito básico de redstone" },
+            { id: 24, title: "Encontrar bioma jungla", desc: "Explorar jungla" },
+            { id: 25, title: "Crear castillo", desc: "Castillo con murallas" },
+            { id: 26, title: "Hacer granja de árboles", desc: "Granja automática de árboles" },
+            { id: 27, title: "Explorar mina abandonada", desc: "Encontrar sistema de minas" },
+            { id: 28, title: "Crear sistema de almacenamiento", desc: "Sistema organizado de cofres" },
+            { id: 29, title: "Hacer puente colgante", desc: "Puente de 50 bloques de largo" },
+            { id: 30, title: "Encontrar geoda", desc: "Geoda de amatista" },
+            { id: 31, title: "Crear granja de melón", desc: "Granja de melón y calabaza" },
+            { id: 32, title: "Hacer torre de vigilancia", desc: "Torre de 30 bloques de altura" },
+            { id: 33, title: "Explorar cuevas profundas", desc: "Llegar a Y= -50" },
+            { id: 34, title: "Explorar 10 estructuras", desc: "Sistema de canales de agua" },
+            { id: 35, title: "Hacer granja de pesca", desc: "Granja automática de pesca" }
+        ];
+
+        let completedMissions = JSON.parse(localStorage.getItem('normalMissions')) || Array(normalMissions.length).fill(false);
+
+        function renderMissions() {
+            const container = document.getElementById('missionsContainer');
+            container.innerHTML = '';
+            
+            normalMissions.forEach((mission, index) => {
+                const missionCard = document.createElement('div');
+                missionCard.className = `mission-card ${completedMissions[index] ? 'completed' : ''}`;
+                
+                missionCard.innerHTML = `
+                    <div style="display: flex; align-items: center;">
+                        <div class="mission-number">${mission.id}</div>
+                        <div class="mission-info">
+                            <h3 class="mission-title">${mission.title}</h3>
+                            <p class="mission-desc">${mission.desc}</p>
+                        </div>
+                    </div>
+                    <button class="complete-btn ${completedMissions[index] ? 'completed' : ''}" 
+                            onclick="toggleMission(${index})"
+                            ${completedMissions[index] ? 'disabled' : ''}>
+                        <i data-lucide="${completedMissions[index] ? 'check' : 'check'}"></i>
+                    </button>
+                `;
+                
+                container.appendChild(missionCard);
+            });
+            
+            updateProgress();
+            lucide.createIcons();
+        }
+
+        function toggleMission(index) {
+            completedMissions[index] = !completedMissions[index];
+            localStorage.setItem('normalMissions', JSON.stringify(completedMissions));
+            renderMissions();
+            
+            if (completedMissions.every(mission => mission)) {
+                setTimeout(() => {
+                    localStorage.setItem('normalCompleted', 'true');
+                    alert('¡Excelente! Has completado todas las misiones normales.');
+                    window.location.href = '../index.html';
+                }, 500);
+            }
+        }
+
+        function updateProgress() {
+            const total = normalMissions.length;
+            const completed = completedMissions.filter(Boolean).length;
+            const percentage = Math.round((completed / total) * 100);
+            
+            document.getElementById('progressFill').style.width = `${percentage}%`;
+            document.getElementById('completedCount').textContent = completed;
+            document.getElementById('percentage').textContent = `${percentage}%`;
+        }
+
+        function goBack() {
+            window.location.href = '../index.html';
+        }
+
+        document.addEventListener('DOMContentLoaded', renderMissions);
+    </script>
+</body>
+</html>

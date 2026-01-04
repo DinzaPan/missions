@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misiones Difíciles - Minecraft</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-dark: #0f0f0f;
+            --card-bg: #1a1a1a;
+            --red-glow: #ff4d4d;
+            --text-white: #ffffff;
+            --text-dim: #777777;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-white);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--text-dim);
+        }
+
+        .back-btn {
+            background: var(--card-bg);
+            border: 2px solid var(--red-glow);
+            color: var(--red-glow);
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: var(--red-glow);
+            color: var(--bg-dark);
+        }
+
+        .title {
+            font-size: 3rem;
+            margin: 0;
+            color: var(--red-glow);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: var(--card-bg);
+            border-radius: 10px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--red-glow);
+            width: 0%;
+            transition: width 0.5s;
+            border-radius: 10px;
+        }
+
+        .missions-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .mission-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .mission-card:hover {
+            border-color: var(--red-glow);
+            transform: translateY(-5px);
+        }
+
+        .mission-card.completed {
+            border-color: var(--red-glow);
+            opacity: 0.7;
+        }
+
+        .mission-info {
+            flex: 1;
+        }
+
+        .mission-title {
+            font-size: 1.2rem;
+            margin: 0 0 5px 0;
+            color: var(--text-white);
+        }
+
+        .mission-desc {
+            font-size: 0.9rem;
+            margin: 0;
+            color: var(--text-dim);
+        }
+
+        .mission-number {
+            background: rgba(255, 77, 77, 0.1);
+            color: var(--red-glow);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+
+        .complete-btn {
+            background: transparent;
+            border: 2px solid var(--red-glow);
+            color: var(--red-glow);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .complete-btn:hover:not(:disabled) {
+            background: var(--red-glow);
+            color: var(--bg-dark);
+        }
+
+        .complete-btn.completed {
+            background: var(--red-glow);
+            color: var(--bg-dark);
+        }
+
+        .complete-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--red-glow);
+            margin: 0;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            margin: 5px 0 0 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <button class="back-btn" onclick="goBack()">
+                <i data-lucide="arrow-left"></i>
+                Volver
+            </button>
+            <h1 class="title">Misiones Difíciles</h1>
+            <div></div>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <p class="stat-number" id="completedCount">0</p>
+                <p class="stat-label">Completadas</p>
+            </div>
+            <div class="stat-item">
+                <p class="stat-number">40</p>
+                <p class="stat-label">Total Misiones</p>
+            </div>
+            <div class="stat-item">
+                <p class="stat-number" id="percentage">0%</p>
+                <p class="stat-label">Progreso</p>
+            </div>
+        </div>
+
+        <div class="missions-container" id="missionsContainer">
+            <!-- Misiones se generarán dinámicamente -->
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // Lista de 40 misiones difíciles de Minecraft
+        const difficultMissions = [
+            { id: 1, title: "Derrotar al Ender Dragon", desc: "Matar al dragón del End" },
+            { id: 2, title: "Encontrar ciudad del End", desc: "Localizar ciudad en el End" },
+            { id: 3, title: "Conseguir Elytra", desc: "Obtener alas Elytra" },
+            { id: 4, title: "Crear granja de wither", desc: "Granja automática de Wither" },
+            { id: 5, title: "Derrotar 3 Withers", desc: "Eliminar 3 jefes Wither" },
+            { id: 6, title: "Encontrar todas las estructuras", desc: "Localizar 10 estructuras diferentes" },
+            { id: 7, title: "Crear base submarina", desc: "Base completa bajo el agua" },
+            { id: 8, title: "Hacer granja de guardianes", desc: "Granja automática de guardianes" },
+            { id: 9, title: "Completar todos los avances", desc: "100% de logros" },
+            { id: 10, title: "Construir mega base", desc: "Base de 100x100 bloques" },
+            { id: 11, title: "Crear sistema de transporte", desc: "Red de transporte compleja" },
+            { id: 12, title: "Hacer granja de wither skeletons", desc: "Granja de esqueletos wither" },
+            { id: 13, title: "Encontrar bioma raro", desc: "Bioma de hongos o picos de hielo" },
+            { id: 14, title: "Crear computadora redstone", desc: "Calculadora con redstone" },
+            { id: 15, title: "Hacer granja de slime", desc: "Granja automática de slime" },
+            { id: 16, title: "Construir castillo medieval", desc: "Castillo detallado con murallas" },
+            { id: 17, title: "Crear sistema de seguridad", desc: "Sistema anti-mobs complejo" },
+            { id: 18, title: "Hacer granja de enderman", desc: "Granja en el End" },
+            { id: 19, title: "Encontrar todas las flores", desc: "Colección completa de flores" },
+            { id: 20, title: "Crear ciudad completa", desc: "Ciudad con 20 edificios" },
+            { id: 21, title: "Hacer granja de blaze", desc: "Granja en fuerte del Nether" },
+            { id: 22, title: "Construir templo antiguo", desc: "Templo con trampas y secretos" },
+            { id: 23, title: "Crear sistema de energía", desc: "Sistema complejo de redstone" },
+            { id: 24, title: "Hacer granja de ghast", desc: "Granja de ghast en Nether" },
+            { id: 25, title: "Encontrar todas las reliquias", desc: "Todos los objetos raros" },
+            { id: 26, title: "Crear parque de diversiones", desc: "Parque con atracciones" },
+            { id: 27, title: "Hacer granja de shulker", desc: "Granja de shulkers en el End" },
+            { id: 28, title: "Construir nave espacial", desc: "Nave espacial detallada" },
+            { id: 29, title: "Crear sistema de teleportación", desc: "Red de portales" },
+            { id: 30, title: "Hacer granja de creeper", desc: "Granja específica de creepers" },
+            { id: 31, title: "Encontrar geodas gigantes", desc: "5 geodas de amatista" },
+            { id: 32, title: "Crear estadio", desc: "Estadio para eventos" },
+            { id: 33, title: "Hacer granja de todos los mobs", desc: "Granja de todos los mobs hostiles" },
+            { id: 34, title: "Construir rascacielos", desc: "Edificio de 200 bloques" },
+            { id: 35, title: "Crear museo", desc: "Museo con todas las colecciones" },
+            { id: 36, title: "Hacer granja de totems", desc: "Granja de totems de inmortalidad" },
+            { id: 37, title: "Encontrar todas las semillas raras", desc: "Colección de semillas raras" },
+            { id: 38, title: "Crear base en el cielo", desc: "Base flotante a Y=200" },
+            { id: 39, title: "Hacer granja de experiencia", desc: "Granja de XP automática" },
+            { id: 40, title: "Construir mundo completo", desc: "Mundo 100% explorado y desarrollado" }
+        ];
+
+        let completedMissions = JSON.parse(localStorage.getItem('difficultMissions')) || Array(difficultMissions.length).fill(false);
+
+        function renderMissions() {
+            const container = document.getElementById('missionsContainer');
+            container.innerHTML = '';
+            
+            difficultMissions.forEach((mission, index) => {
+                const missionCard = document.createElement('div');
+                missionCard.className = `mission-card ${completedMissions[index] ? 'completed' : ''}`;
+                
+                missionCard.innerHTML = `
+                    <div style="display: flex; align-items: center;">
+                        <div class="mission-number">${mission.id}</div>
+                        <div class="mission-info">
+                            <h3 class="mission-title">${mission.title}</h3>
+                            <p class="mission-desc">${mission.desc}</p>
+                        </div>
+                    </div>
+                    <button class="complete-btn ${completedMissions[index] ? 'completed' : ''}" 
+                            onclick="toggleMission(${index})"
+                            ${completedMissions[index] ? 'disabled' : ''}>
+                        <i data-lucide="${completedMissions[index] ? 'check' : 'check'}"></i>
+                    </button>
+                `;
+                
+                container.appendChild(missionCard);
+            });
+            
+            updateProgress();
+            lucide.createIcons();
+        }
+
+        function toggleMission(index) {
+            completedMissions[index] = !completedMissions[index];
+            localStorage.setItem('difficultMissions', JSON.stringify(completedMissions));
+            renderMissions();
+            
+            if (completedMissions.every(mission => mission)) {
+                setTimeout(() => {
+                    localStorage.setItem('difficultCompleted', 'true');
+                    alert('¡Increíble! Has completado TODAS las misiones. ¡Eres un maestro de Minecraft!');
+                    window.location.href = '../index.html';
+                }, 500);
+            }
+        }
+
+        function updateProgress() {
+            const total = difficultMissions.length;
+            const completed = completedMissions.filter(Boolean).length;
+            const percentage = Math.round((completed / total) * 100);
+            
+            document.getElementById('progressFill').style.width = `${percentage}%`;
+            document.getElementById('completedCount').textContent = completed;
+            document.getElementById('percentage').textContent = `${percentage}%`;
+        }
+
+        function goBack() {
+            window.location.href = '../index.html';
+        }
+
+        document.addEventListener('DOMContentLoaded', renderMissions);
+    </script>
+</body>
+</html>

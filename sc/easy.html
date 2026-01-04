@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misiones Fáciles - Minecraft</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-dark: #0f0f0f;
+            --card-bg: #1a1a1a;
+            --green-glow: #00ff88;
+            --text-white: #ffffff;
+            --text-dim: #777777;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-white);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--text-dim);
+        }
+
+        .back-btn {
+            background: var(--card-bg);
+            border: 2px solid var(--green-glow);
+            color: var(--green-glow);
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: var(--green-glow);
+            color: var(--bg-dark);
+        }
+
+        .title {
+            font-size: 3rem;
+            margin: 0;
+            color: var(--green-glow);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: var(--card-bg);
+            border-radius: 10px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--green-glow);
+            width: 0%;
+            transition: width 0.5s;
+            border-radius: 10px;
+        }
+
+        .missions-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .mission-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .mission-card:hover {
+            border-color: var(--green-glow);
+            transform: translateY(-5px);
+        }
+
+        .mission-card.completed {
+            border-color: var(--green-glow);
+            opacity: 0.7;
+        }
+
+        .mission-info {
+            flex: 1;
+        }
+
+        .mission-title {
+            font-size: 1.2rem;
+            margin: 0 0 5px 0;
+            color: var(--text-white);
+        }
+
+        .mission-desc {
+            font-size: 0.9rem;
+            margin: 0;
+            color: var(--text-dim);
+        }
+
+        .mission-number {
+            background: rgba(0, 255, 136, 0.1);
+            color: var(--green-glow);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+
+        .complete-btn {
+            background: transparent;
+            border: 2px solid var(--green-glow);
+            color: var(--green-glow);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .complete-btn:hover:not(:disabled) {
+            background: var(--green-glow);
+            color: var(--bg-dark);
+        }
+
+        .complete-btn.completed {
+            background: var(--green-glow);
+            color: var(--bg-dark);
+        }
+
+        .complete-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--green-glow);
+            margin: 0;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            margin: 5px 0 0 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <button class="back-btn" onclick="goBack()">
+                <i data-lucide="arrow-left"></i>
+                Volver
+            </button>
+            <h1 class="title">Misiones Fáciles</h1>
+            <div></div> <!-- Espaciador -->
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <p class="stat-number" id="completedCount">0</p>
+                <p class="stat-label">Completadas</p>
+            </div>
+            <div class="stat-item">
+                <p class="stat-number">29</p>
+                <p class="stat-label">Total Misiones</p>
+            </div>
+            <div class="stat-item">
+                <p class="stat-number" id="percentage">0%</p>
+                <p class="stat-label">Progreso</p>
+            </div>
+        </div>
+
+        <div class="missions-container" id="missionsContainer">
+            <!-- Misiones se generarán dinámicamente -->
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // Lista de 29 misiones fáciles de Minecraft
+        const easyMissions = [
+            { id: 1, title: "Minar 120 de madera", desc: "Recolecta 120 bloques de cualquier tipo de madera" },
+            { id: 2, title: "Conseguir agua y lava", desc: "Obtén cubos de agua y lava" },
+            { id: 3, title: "Crear mesa de trabajo", desc: "Fabrica una mesa de trabajo básica" },
+            { id: 4, title: "Construir casa básica", desc: "Construye una casa de 4x4 bloques" },
+            { id: 5, title: "Encontrar carbón", desc: "Mineral de carbón" },
+            { id: 6, title: "Crear 5 antorchas", desc: "Fabricar antorchas para iluminación" },
+            { id: 7, title: "Cocinar 10 alimentos", desc: "Usar el horno para cocinar" },
+            { id: 8, title: "Criar 5 animales", desc: "Reproducir animales de granja" },
+            { id: 9, title: "Hacer cama", desc: "Crear una cama para dormir" },
+            { id: 10, title: "Encontrar hierro", desc: "Mineral de hierro" },
+            { id: 11, title: "Crear herramientas de hierro", desc: "Pico, hacha y espada de hierro" },
+            { id: 12, title: "Explorar cueva", desc: "Encontrar y explorar una cueva" },
+            { id: 13, title: "Construir granja", desc: "Granja básica de trigo" },
+            { id: 14, title: "Crear armadura de cuero", desc: "Armadura completa de cuero" },
+            { id: 15, title: "Pescar 5 peces", desc: "Usar caña de pescar" },
+            { id: 16, title: "Hacer horno", desc: "Crear horno de cocina" },
+            { id: 17, title: "Minar 64 piedra", desc: "Recolectar bloques de piedra" },
+            { id: 18, title: "Crear cofre", desc: "Almacenamiento básico" },
+            { id: 19, title: "Encontrar semillas", desc: "Semillas para cultivar" },
+            { id: 20, title: "Hacer puerta", desc: "Puerta de madera" },
+            { id: 21, title: "Iluminar área", desc: "Colocar 20 antorchas" },
+            { id: 22, title: "Crear escaleras", desc: "Escaleras de madera o piedra" },
+            { id: 23, title: "Hacer ventana", desc: "Ventana con vidrio" },
+            { id: 24, title: "Construir valla", desc: "Valla para animales" },
+            { id: 25, title: "Encontrar flores", desc: "5 tipos diferentes de flores" },
+            { id: 26, title: "Crear libro", desc: "Libro para encantamientos" },
+            { id: 27, title: "Hacer señal", desc: "Letrero con mensaje" },
+            { id: 28, title: "Cavar pozo", desc: "Pozo de agua" },
+            { id: 29, title: "Decorar casa", desc: "Decorar interior con cuadros" }
+        ];
+
+        let completedMissions = JSON.parse(localStorage.getItem('easyMissions')) || Array(easyMissions.length).fill(false);
+
+        function renderMissions() {
+            const container = document.getElementById('missionsContainer');
+            container.innerHTML = '';
+            
+            easyMissions.forEach((mission, index) => {
+                const missionCard = document.createElement('div');
+                missionCard.className = `mission-card ${completedMissions[index] ? 'completed' : ''}`;
+                
+                missionCard.innerHTML = `
+                    <div style="display: flex; align-items: center;">
+                        <div class="mission-number">${mission.id}</div>
+                        <div class="mission-info">
+                            <h3 class="mission-title">${mission.title}</h3>
+                            <p class="mission-desc">${mission.desc}</p>
+                        </div>
+                    </div>
+                    <button class="complete-btn ${completedMissions[index] ? 'completed' : ''}" 
+                            onclick="toggleMission(${index})"
+                            ${completedMissions[index] ? 'disabled' : ''}>
+                        <i data-lucide="${completedMissions[index] ? 'check' : 'check'}"></i>
+                    </button>
+                `;
+                
+                container.appendChild(missionCard);
+            });
+            
+            updateProgress();
+            lucide.createIcons();
+        }
+
+        function toggleMission(index) {
+            completedMissions[index] = !completedMissions[index];
+            localStorage.setItem('easyMissions', JSON.stringify(completedMissions));
+            renderMissions();
+            
+            // Verificar si todas las misiones están completadas
+            if (completedMissions.every(mission => mission)) {
+                setTimeout(() => {
+                    localStorage.setItem('easyCompleted', 'true');
+                    alert('¡Felicidades! Has completado todas las misiones fáciles.');
+                    window.location.href = '../index.html';
+                }, 500);
+            }
+        }
+
+        function updateProgress() {
+            const total = easyMissions.length;
+            const completed = completedMissions.filter(Boolean).length;
+            const percentage = Math.round((completed / total) * 100);
+            
+            document.getElementById('progressFill').style.width = `${percentage}%`;
+            document.getElementById('completedCount').textContent = completed;
+            document.getElementById('percentage').textContent = `${percentage}%`;
+        }
+
+        function goBack() {
+            window.location.href = '../index.html';
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', renderMissions);
+    </script>
+</body>
+</html>
